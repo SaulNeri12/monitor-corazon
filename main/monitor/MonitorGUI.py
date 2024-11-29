@@ -7,6 +7,7 @@ from threading import Thread
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
+from tkinter import messagebox
 import time
 
 from app.database import obtener_conexion_bd
@@ -54,8 +55,11 @@ boton = tk.Button(root, text="Obtener Fechas y Texto", command=None)
 boton.pack(padx=10, pady=20)
 
 
+# usado para detener el thread
+recibir_lecturas_flg = True
+
 def actualiza_panel_lecturas():
-    while True:
+    while recibir_lecturas_flg:
         # se obtiene la lectura del modulo
         bpm = obtener_lectura_bpm()
         if (bpm != None): 
@@ -70,8 +74,19 @@ def actualiza_panel_lecturas():
         # el hilo se detiene un tiempo antes de tomar otra lectura
         time.sleep(Configuracion.VELOCIDAD_LECTURA_SEGUNDOS)
         
+hilo_actualiza_panel = Thread(target=actualiza_panel_lecturas, daemon=True)
 
-hilo_actualiza_panel = Thread(target=actualiza_panel_lecturas)
+def on_close():
+    # Mostrar un mensaje de confirmación
+    if messagebox.askyesno("Monitor RT - Salir", "¿Estás seguro de que deseas cerrar la ventana?"):
+        root.destroy()  # Cerrar la ventana
+        recibir_lecturas_flg = False
+        print("### MonitorGUI.py -> Se cerro el frame")
+    else:
+        print("### MonitorGUI.py -> El cierre fue cancelado.")
+
+# asignar el evento de cuando se quiere cerrar el frame
+root.protocol("WM_DELETE_WINDOW", on_close)
 
 def main():
     hilo_actualiza_panel.start()
