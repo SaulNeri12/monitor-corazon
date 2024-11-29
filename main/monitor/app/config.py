@@ -7,3 +7,4 @@ class Configuracion():
     MONITOR_CORAZON_URL = "http:"
     MONITOR_CORAZON_SENSOR_BOM_URL = "http://192.168.0.103/bpm"
     VELOCIDAD_LECTURA_SEGUNDOS = 2 # dos segundos cada lectura
+    PRECISION_LECTURAS = 10 # media de un arreglo de 10 lecturas
