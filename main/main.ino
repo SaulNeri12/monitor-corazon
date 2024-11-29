@@ -1,29 +1,80 @@
 
+#include <Arduino.h>
+#include <WiFi.h>
+#include <AsyncTCP.h>
 #include <NoDelay.h>
+#include <ESPAsyncWebServer.h>
+#include <WebSerial.h>
+
 #include "MonitorCorazon.h"
 
-unsigned long previousMillis = 0;
-const long interval = 1000;
+AsyncWebServer server(80);
 
-IMonitorCorazon *monitor;
+const char *ssid = "CHURRUMAIS";   // Your WiFi SSID
+const char *password = "12345678"; // Your WiFi Password
 
-void setup() {
+IMonitorCorazon *monitorAD8232;
+
+unsigned long last_print_time = millis();
+
+void setup()
+{
   Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
 
-  monitor = new MonitorStub();
+  monitorAD8232 = new MonitorStub();
 
-  monitor->iniciar(0x00);
+  monitorAD8232->iniciar(0x00);
 
-  //pinMode(LED_PIN, OUTPUT);
-}
-
-void loop() {
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
-    
-    Serial.printf("BPM: %d\n", monitor->leerSenialDigital());
-
-    previousMillis = currentMillis;
-    //digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+  while (WiFi.waitForConnectResult() != WL_CONNECTED)
+  {
+    Serial.printf(".");
+    delay(1000);
   }
+
+  // Once connected, print IP
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(200, "text/plain", "Hi! This is WebSerial demo. You can access webserial interface at http://" + WiFi.localIP().toString() + "/webserial"); });
+
+  server.on("/bpm", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(200, "text/plain", String(monitorAD8232->leerSenialDigital())); });
+
+  // WebSerial is accessible at "<IP Address>/webserial" in browser
+  WebSerial.begin(&server);
+
+  /* Attach Message Callback */
+  WebSerial.onMessage([&](uint8_t *data, size_t len)
+                      {
+    Serial.printf("Received %u bytes from WebSerial: ", len);
+    Serial.write(data, len);
+    Serial.println();
+    WebSerial.println("Received Data...");
+    String d = "";
+    for(size_t i=0; i < len; i++){
+      d += char(data[i]);
+    }
+    WebSerial.println(d); });
+
+  // Start server
+  server.begin();
 }
+
+void loop()
+{
+  // Print every 2 seconds (non-blocking)
+  if ((unsigned long)(millis() - last_print_time) > 2000)
+  {
+    WebSerial.print(F("IP address: "));
+    WebSerial.println(WiFi.localIP());
+    WebSerial.printf("Uptime: %lums\n", millis());
+    WebSerial.printf("Free heap: %" PRIu32 "\n", ESP.getFreeHeap());
+    last_print_time = millis();
+  }
+
+  WebSerial.loop();
+}
+

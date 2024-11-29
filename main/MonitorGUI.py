@@ -9,7 +9,7 @@ root.title("Monitor de Corazon")
 text_area_label = tk.Label(root, text="Lecturas: ")
 text_area_label.pack(padx=10, pady=5)
 
-text_area = tk.Text(root, height=10, width=40)
+text_area = tk.Text(root, height=20, width=80)
 text_area.pack(padx=10, pady=10)
 
 # Crear campos de fecha (solo Entry widgets para que el usuario ingrese las fechas manualmente)
@@ -25,19 +25,12 @@ fecha_fin_label.pack(padx=10, pady=5)
 fecha_fin = tk.Entry(root, width=20)
 fecha_fin.pack(padx=10, pady=5)
 
-# Función que se ejecuta al presionar el botón
-def obtener_fecha():
-    inicio = fecha_inicio.get()
-    fin = fecha_fin.get()
-    print(f"Fecha de inicio: {inicio}")
-    print(f"Fecha de fin: {fin}")
-    print("Texto ingresado en el área de texto:")
-    print(text_area.get("1.0", tk.END))
-
 # Botón para obtener las fechas y texto
-boton = tk.Button(root, text="Obtener Fechas y Texto", command=obtener_fecha)
+boton = tk.Button(root, text="Obtener Fechas y Texto", command=None)
 boton.pack(padx=10, pady=20)
 
-# Ejecutar la ventana principal
-root.mainloop()
+def main():
+    root.mainloop()
 
+if __name__ == "__main__":
+    main()
