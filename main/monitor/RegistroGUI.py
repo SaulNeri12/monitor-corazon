@@ -1,5 +1,24 @@
+
+"""
+Monitor GUI para observar las lecturas almacenadas en la base de datos
+"""
+
 import tkinter as tk
 from tkinter import ttk
+
+from app.database import obtener_conexion_bd
+from app.models import Lectura, LecturaException
+
+"""
+import datetime
+
+sesion = obtener_conexion_bd()
+
+lectura = Lectura(90, 80)
+sesion.add(lectura)
+sesion.commit()
+sesion.close()
+"""
 
 # Crear la ventana principal
 root = tk.Tk()
