@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Ritmo Cardíaco</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #heartRateChart {
+            width: 100%;
+            max-height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Monitor de Ritmo Cardíaco en Tiempo Real</h1>
+
+    <div>
+        <h2>Ritmo Cardíaco Actual: <span id="currentHeartRate">--</span> BPM</h2>
+        <canvas id="heartRateChart"></canvas>
+    </div>
+
+    <!--<script src="corazon.js"></script>-->
+    <script>
+        //Configuracion de la grafica con la libreria chart.js
+        const ctx = document.getElementById('heartRateChart').getContext('2d');
+        const heartRateDisplay = document.getElementById('currentHeartRate');
+
+        const heartRateChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Ritmo Cardíaco (BPM)',
+                    data: [],
+                    borderColor: 'rgb(255, 0, 0)',
+                    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 40,
+                        max: 200,
+                        title: {
+                            display: true,
+                            text: 'Latidos por Minuto (BPM)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Función para simular datos de ritmo cardíaco
+        function simulateHeartRate() {
+            // Simulación de un ritmo cardíaco variando entre 60-100 BPM
+            const heartRate = 60 + Math.floor(Math.random() * 40);
+
+            // Actualizar gráfica
+            const now = new Date().toLocaleTimeString();
+            heartRateChart.data.labels.push(now);
+            heartRateChart.data.datasets[0].data.push(heartRate);
+
+            // Mantener solo los últimos 10 puntos
+            if (heartRateChart.data.labels.length > 10) {
+                heartRateChart.data.labels.shift();
+                heartRateChart.data.datasets[0].data.shift();
+            }
+
+            // Actualizar display
+            heartRateDisplay.textContent = heartRate;
+
+            // Actualizar gráfica
+            heartRateChart.update();
+        }
+
+        // Simular datos cada 2 segundos
+        setInterval(simulateHeartRate, 2000);
+
+    </script>
+</body>
+
+</html>
