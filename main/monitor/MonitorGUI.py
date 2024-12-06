@@ -20,7 +20,7 @@ sesionBD = obtener_conexion_bd()
 
 # Crear la ventana principal
 root = tk.Tk()
-root.title("Monitor de Corazon")
+root.title("Monitor de Corazon - Tiempo Real")
 
 # Crear un área de texto (Text widget)
 text_area_label = tk.Label(root, text="Lecturas: ")
@@ -28,6 +28,7 @@ text_area_label.pack(padx=10, pady=5)
 
 lecturas_text_area = tk.Text(root, height=20, width=80)
 lecturas_text_area.pack(padx=10, pady=10)
+lecturas_text_area.config(state="disabled")
 
 # Crear campos de fecha (solo Entry widgets para que el usuario ingrese las fechas manualmente)
 fecha_inicio_label = tk.Label(root, text="Fecha de inicio (YYYY-MM-DD):")

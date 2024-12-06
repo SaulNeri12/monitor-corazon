@@ -6,6 +6,9 @@
 #include <ESPAsyncWebServer.h>
 #include <WebSerial.h>
 
+#include "FS.h"
+#include "LittleFS.h"
+
 AsyncWebServer server(80);
 
 const char *ssid = "CHURRUMAIS";    // Your WiFi SSID
@@ -218,6 +221,23 @@ void setup() {
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Hi! This is WebSerial demo. You can access webserial interface at http://" + WiFi.localIP().toString() + "/webserial");
+  });
+
+  server.on("/monitor", HTTP_GET, [](AsyncWebServerRequest *request) {
+    File file = LittleFS.open("/pagina.html", "r");  // Abrir el archivo en modo lectura
+
+    if (!file) {
+      request->send(404, "text/plain", "Archivo no encontrado");
+      return;
+    }
+
+
+    String content = file.readString();  // Leer todo el contenido del archivo
+    
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/html", content);
+    request->send(response);
+
+    file.close();
   });
 
   server.on("/bpm", HTTP_GET, [](AsyncWebServerRequest *request) {

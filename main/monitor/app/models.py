@@ -25,6 +25,9 @@ class Lectura(Base):
     def __init__(self, bpm, senal_analoga):
         self.bpm = bpm;
         self.senial_analoga = senal_analoga;
+    
+    def __str__(self):
+        return f"{self.fecha_hora}\tBPM: {self.bpm}\t\tECG: {self.senial_analoga}"
         
 # crea todos los modelos que se registran aqui
 Base.metadata.create_all(engine)
