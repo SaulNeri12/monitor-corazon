@@ -221,7 +221,7 @@ void setup() {
   });
 
   server.on("/bpm", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *response = request->beginResponse(200, "application/json", String(heartMonitor.getBPM()));
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", String(heartMonitor.getBPM()));
     response->addHeader("Access-Control-Allow-Origin", "*");
     response->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     response->addHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -229,7 +229,7 @@ void setup() {
   });
 
   server.on("/ecg", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *response = request->beginResponse(200, "application/json", String(heartMonitor.getECG()));
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", String(heartMonitor.getECG()));
     response->addHeader("Access-Control-Allow-Origin", "*");
     response->addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     response->addHeader("Access-Control-Allow-Headers", "Content-Type");
