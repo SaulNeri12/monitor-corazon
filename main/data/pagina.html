@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Ritmo Cardíaco y ECG</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 30%;
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .green { color: #4caf50; }
+        .blue { color: #2196f3; }
+        .yellow { color: #ff9800; }
+    </style>
+</head>
+
+<body>
+    <h1>Monitor de Ritmo Cardíaco y ECG en Tiempo Real</h1>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>Frecuencia Cardíaca</h3>
+            <div class="value green" id="currentHeartRate">--</div>
+        </div>
+        <div class="stat-card">
+            <h3>Mínima</h3>
+            <div class="value blue" id="minHeartRate">--</div>
+        </div>
+        <div class="stat-card">
+            <h3>Máxima</h3>
+            <div class="value yellow" id="maxHeartRate">--</div>
+        </div>
+    </div>
+
+    <h2>Ritmo Cardíaco Actual: <span id="currentHeartRateText">--</span> BPM</h2>
+    
+    <div class="chart-container">
+        <h3>Frecuencia Cardíaca</h3>
+        <canvas id="heartRateChart"></canvas>
+    </div>
+
+    <div style="margin-top: 5rem;" class="chart-container">
+        <h3>Señal de ECG</h3>
+        <canvas id="ecgChart"></canvas>
+    </div>
+
+    <script>
+        // Configuración de la gráfica de Frecuencia Cardíaca
+        const ctxHeartRate = document.getElementById('heartRateChart').getContext('2d');
+        const ctxECG = document.getElementById('ecgChart').getContext('2d');
+        const heartRateDisplay = document.getElementById('currentHeartRate');
+        const heartRateText = document.getElementById('currentHeartRateText');
+        const minHeartRateDisplay = document.getElementById('minHeartRate');
+        const maxHeartRateDisplay = document.getElementById('maxHeartRate');
+
+        // Estados para seguimiento de frecuencia cardíaca
+        let minHeartRate = Infinity;
+        let maxHeartRate = -Infinity;
+
+        const heartRateChart = new Chart(ctxHeartRate, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Ritmo Cardíaco (BPM)',
+                    data: [],
+                    borderColor: 'rgb(255, 0, 0)',
+                    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                animation: {
+                    duration: 0 // Eliminar animaciones para actualización instantánea
+                },
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 40,
+                        max: 200,
+                        title: {
+                            display: true,
+                            text: 'Latidos por Minuto (BPM)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
+                        }
+                    }
+                }
+            }
+        });
+
+        const ecgChart = new Chart(ctxECG, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Señal de ECG',
+                    data: [],
+                    borderColor: 'rgb(0, 0, 255)',
+                    backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                animation: {
+                    duration: 0 // Eliminar animaciones para actualización instantánea
+                },
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Amplitud'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tiempo'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Función para simular datos de ritmo cardíaco y ECG
+        function addReadings(bpm, ecgValue) {
+            // Validar que los valores no sean null o NaN
+            if (bpm === null || isNaN(bpm)) return;
+            if (ecgValue === null || isNaN(ecgValue)) return;
+
+            // Actualizar estadísticas de frecuencia cardíaca
+            minHeartRate = Math.min(minHeartRate, bpm);
+            maxHeartRate = Math.max(maxHeartRate, bpm);
+
+            // Actualizar gráficas
+            const now = new Date().toLocaleTimeString();
+            
+            // Frecuencia Cardíaca
+            heartRateChart.data.labels.push(now);
+            heartRateChart.data.datasets[0].data.push(bpm);
+
+            // ECG
+            ecgChart.data.labels.push(now);
+            ecgChart.data.datasets[0].data.push(ecgValue);
+
+            // Mantener solo los últimos 10 puntos
+            if (heartRateChart.data.labels.length > 30) {
+                heartRateChart.data.labels.shift();
+                heartRateChart.data.datasets[0].data.shift();
+                ecgChart.data.labels.shift();
+                ecgChart.data.datasets[0].data.shift();
+            }
+
+            // Actualizar displays
+            heartRateDisplay.textContent = bpm;
+            heartRateText.textContent = bpm;
+            minHeartRateDisplay.textContent = minHeartRate === Infinity ? '--' : minHeartRate;
+            maxHeartRateDisplay.textContent = maxHeartRate === -Infinity ? '--' : maxHeartRate;
+
+            // Actualizar gráficas
+            heartRateChart.update('none'); // Actualización instantánea sin animación
+            ecgChart.update('none'); // Actualización instantánea sin animación
+        }
+
+        // Función asincrónica para obtener los datos del servidor
+        async function readDataFromServer() {
+            try {
+                const bpmResponse = await fetch("http://192.168.0.139/bpm");
+                const ecgResponse = await fetch("http://192.168.0.139/ecg");
+
+                if (!bpmResponse.ok || !ecgResponse.ok) {
+                    throw new Error(`HTTP error! BPM Status: ${bpmResponse.status}, ECG Status: ${ecgResponse.status}`);
+                }
+
+                const bpm = Number.parseInt(await bpmResponse.text());
+                const ecgValue = Number.parseFloat(await ecgResponse.text());
+
+                console.log('BPM:', bpm, 'ECG:', ecgValue);
+                return { bpm, ecgValue };
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return { bpm: null, ecgValue: null };
+            }
+        }
+
+        // Actualizar datos cada 500 ms
+        setInterval(async () => {
+            const { bpm, ecgValue } = await readDataFromServer();
+            addReadings(bpm, ecgValue);
+        }, 500);
+    </script>
+</body>
+
+</html>
