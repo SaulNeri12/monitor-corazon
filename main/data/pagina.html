@@ -79,7 +79,7 @@
         <canvas id="heartRateChart"></canvas>
     </div>
 
-    <div class="chart-container">
+    <div style="margin-top: 5rem;" class="chart-container">
         <h3>Señal de ECG</h3>
         <canvas id="ecgChart"></canvas>
     </div>
@@ -212,8 +212,8 @@
         // Función asincrónica para obtener los datos del servidor
         async function readDataFromServer() {
             try {
-                const bpmResponse = await fetch("http://192.168.203.246/bpm");
-                const ecgResponse = await fetch("http://192.168.203.246/ecg");
+                const bpmResponse = await fetch("http://192.168.0.139/bpm");
+                const ecgResponse = await fetch("http://192.168.0.139/ecg");
 
                 if (!bpmResponse.ok || !ecgResponse.ok) {
                     throw new Error(`HTTP error! BPM Status: ${bpmResponse.status}, ECG Status: ${ecgResponse.status}`);

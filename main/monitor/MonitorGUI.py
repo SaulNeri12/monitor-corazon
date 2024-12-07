@@ -15,6 +15,18 @@ from app.models import Lectura, LecturaException
 from app.sensor.ecg import obtener_lectura_bpm
 from app.config import Configuracion
 
+# usado para abrir la ventana con la pagina de muestra 
+# en tiempo real del sensor
+import os
+import webbrowser
+
+# Obtener la ruta del archivo .html que muestra
+# la grafica en tiempo real
+ruta_actual = os.getcwd()
+carpeta_data = os.path.dirname(ruta_actual)
+pagina_sensor = os.path.join(carpeta_data, "data", "pagina.html")
+webbrowser.open(pagina_sensor)
+
 # usado para interactuar con la base de datos...
 sesionBD = obtener_conexion_bd()
 
@@ -28,24 +40,13 @@ text_area_label.pack(padx=10, pady=5)
 
 lecturas_text_area = tk.Text(root, height=20, width=80)
 lecturas_text_area.pack(padx=10, pady=10)
-lecturas_text_area.config(state="disabled")
 
-# Crear campos de fecha (solo Entry widgets para que el usuario ingrese las fechas manualmente)
-fecha_inicio_label = tk.Label(root, text="Fecha de inicio (YYYY-MM-DD):")
-fecha_inicio_label.pack(padx=10, pady=5)
-
-fecha_inicio = tk.Entry(root, width=20)
-fecha_inicio.pack(padx=10, pady=5)
-
-fecha_fin_label = tk.Label(root, text="Fecha de fin (YYYY-MM-DD):")
-fecha_fin_label.pack(padx=10, pady=5)
-
-fecha_fin = tk.Entry(root, width=20)
-fecha_fin.pack(padx=10, pady=5)
+def limpiar_log_lecturas():
+    lecturas_text_area.delete(1.0, tk.END)
 
 # Botón para obtener las fechas y texto
-boton = tk.Button(root, text="Obtener Fechas y Texto", command=None)
-boton.pack(padx=10, pady=20)
+boton_limpiar = tk.Button(root, text="limpiar Resultados", command=limpiar_log_lecturas)
+boton_limpiar.pack(padx=10, pady=20)
 
 # usado para detener el thread
 recibir_lecturas_flg = True
@@ -58,7 +59,7 @@ def actualiza_panel_lecturas():
     while recibir_lecturas_flg:
         # se obtiene la lectura del modulo
         bpm = obtener_lectura_bpm()
-        if (bpm != None): 
+        if (bpm != None):
             # Obtiene la fecha y hora actual
             fecha_hora_actual = datetime.now()
             # Crear el string con f-string

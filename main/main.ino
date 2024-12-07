@@ -11,8 +11,8 @@
 
 AsyncWebServer server(80);
 
-const char *ssid = "CHURRUMAIS";    // Your WiFi SSID
-const char *password = "12345678";  // Your WiFi Password
+const char *ssid = "MEGACABLE-46F8";    // Your WiFi SSID
+const char *password = "8DYNFNU8BU14";  // Your WiFi Password
 
 // Pin definitions
 #define ECG_PIN 34

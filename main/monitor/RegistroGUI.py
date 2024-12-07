@@ -1,18 +1,27 @@
 
 """
-Monitor GUI para observar las lecturas almacenadas en la base de datos
+Monitor GUI - Usado para observar las lecturas almacenadas en la base de datos
 """
+
+
+from app.sensor.ecg import obtener_lecturas_periodo
 
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-
 from datetime import datetime
 
-#from app.database import obtener_conexion_bd
-#from app.models import Lectura, LecturaException
+# usado para abrir la ventana con la pagina de muestra 
+# en tiempo real del sensor
+import os
+import webbrowser
 
-from app.sensor.ecg import obtener_lecturas_periodo
+# Obtener la ruta del archivo .html que muestra
+# la grafica en tiempo real
+ruta_actual = os.getcwd()
+carpeta_data = os.path.dirname(ruta_actual)
+pagina_sensor = os.path.join(carpeta_data, "data", "pagina.html")
+webbrowser.open(pagina_sensor)
 
 # Crear la ventana principal
 root = tk.Tk()
