@@ -13,7 +13,16 @@ import time
 from app.database import obtener_conexion_bd
 from app.models import Lectura, LecturaException
 from app.sensor.ecg import obtener_lectura_bpm
-from app.config import Configuracion
+from app.config import Configuracion, inicializar_configuracion
+
+import sys
+
+if len(sys.argv) < 2:
+    print("[=!=] Porfavor proporciona la IP asignada por el router a el ESP32")
+    sys.exit(1)
+else:
+    print(sys.argv[1])
+    inicializar_configuracion(sys.argv[1])
 
 # usado para abrir la ventana con la pagina de muestra 
 # en tiempo real del sensor
